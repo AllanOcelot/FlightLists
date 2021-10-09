@@ -16,14 +16,11 @@ export default {
 </script>
 
 
-<style>
+<style lang="scss">
+@import "./assets/vars.scss";
 
 body {
-  background-image: url('assets/bg.jpg');
-  background-size: cover;
-  background-position:  right;
-  background-repeat: no-repeat;
-  background-color: #B6E3F8;
+  background-color: $color-grey;
   min-height: 100vh;
   display: flex;
 }

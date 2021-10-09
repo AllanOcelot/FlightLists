@@ -14,6 +14,7 @@
       <p>{{CheckListData.Desc}}</p>
     </div>
 
+
     <ul class="nav nav-tabs" v-if="CheckListData.Data">
       <li
         v-for="item in CheckListData.Data"
@@ -55,26 +56,27 @@
               </span>
             </div>
 
-            <transition name="slide-fade">
-              <div class="checklist-section" v-if="!item.Hidden">
-                
-                <div class="checklist-items" v-for="checklistItem in item.Data" :key="checklistItem.Name">
-                  <div class="form-check form-switch">
-                    <label class="form-check-label" :for="checklistItem.Name">
-                      <span>{{checklistItem.Name}}</span><br>
-                      <small v-if="checklistItem.Desc.length > 1">{{checklistItem.Desc}}</small>
-                      <small v-else> &nbsp; </small>
-                    </label>
 
-                    <input class="form-check-input" type="checkbox" role="switch" 
-                      :id="checklistItem.Name"
-                      v-model="checklistItem.Value"
-                      v-on:change="updateProgress(checklist, item)"
-                    >
+              <div class="checklist-section" :class="{visible: !item.Hidden}">
+                <transition-group name="slide-fade">
+                  <div v-if="!item.Hidden">
+                    <div class="checklist-items" v-for="checklistItem in item.Data" :key="checklistItem.Name">
+                      <div class="form-check form-switch">
+                        <label class="form-check-label" :for="checklistItem.Name">
+                          <span>{{checklistItem.Name}}</span><br>
+                          <small v-if="checklistItem.Desc.length > 1">{{checklistItem.Desc}}</small>
+                          <small v-else> &nbsp; </small>
+                        </label>
+                        <input class="form-check-input" type="checkbox" role="switch" 
+                          :id="checklistItem.Name"
+                          v-model="checklistItem.Value"
+                          v-on:change="updateProgress(checklist, item)"
+                        >
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </transition-group>
               </div>
-            </transition>
           </div>
 
           <div class="checklist-progress">
@@ -205,11 +207,10 @@ export default {
     margin-bottom: 50px;
     overflow: hidden;
 
-
     .info {
       padding: 60px 20px;
-      background: #0d1624;
-      color: #f1f1f1;
+      background: $brand-blue;
+      color: $color-white;
 
       h3 {
         margin: 0;
@@ -220,10 +221,19 @@ export default {
       }
     }
 
+    .nav-tabs {
+      background: $color-grey;
+      padding: 20px 0 0 0;
+
+    }
+
+    .checklist-container {
+      padding: 20px;
+    }
 
     .checklist {
       .checklist-parent {
-        background: #efefef;
+        background: $color-grey;
         border-bottom: 1px solid #d9d9d9;
         overflow: hidden;
         .title {
@@ -231,7 +241,7 @@ export default {
           text-align: left;
           padding: 10px 20px;
           margin: 0;
-          background: $title-bg;
+          background: $brand-dark;
           font-weight: 600;
           color: #fff;
           position: relative;
@@ -269,16 +279,12 @@ export default {
             width: 0;
             top: 0;
             height: 100%;
-            background: #0d6efd;
-            opacity: 0.3;
+            background: $brand-green;
             transition: all 0.4s;
             transition-delay: all 0.3s;
             pointer-events: none;
             &.complete {
-              background: #0d6efd;
-              opacity: 0.5;
-              transition: opacity 0.8s, width 0.4s, background 0.4s;
-              transition-delay: opacity 0.7s, background 0.4s;
+              transition: width 0.4s, background 0.4s;
             }
           }
         }
@@ -286,13 +292,20 @@ export default {
         .checklist-section {
           position: relative;
           z-index: 0;
-          padding: 20px 20px 0 20px;
+          opacity: 0;
+          transition: all 0.6s ease-in-out;
+
+          &.visible {
+            opacity: 1;
+            padding: 20px 20px 0 20px;
+          }
+
           .checklist-items {
             padding-bottom: 20px;
             .form-switch {
               display: flex;
               align-items: center;
-              padding: 0 20px;
+              padding: 0;
 
               label {
                 pointer-events: none;
@@ -353,10 +366,15 @@ export default {
     transition: all 0.4s cubic-bezier(1, 0.5, 0.8, 1);
   }
 
+  .slide-fade-leave-to {
+
+  }
+
   .slide-fade-enter-from,
   .slide-fade-leave-to {
     transform: translateY(-50%);
     opacity: 0;
+    transition: all 0.4s;
   }
 
 

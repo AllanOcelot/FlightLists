@@ -44,6 +44,19 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="scss" scoped>
+  @import "../assets/vars.scss";
+
+  .navbar {
+    border-bottom: 2px solid $brand-yellow;
+
+    .navbar-brand {
+      color: $brand-blue;
+      font-weight: 600;
+      letter-spacing: 1px;
+      border-right: 1px solid $color-grey;
+      padding-right: 15px;
+    }
+  }
 
 </style>
