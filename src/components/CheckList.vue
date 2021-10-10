@@ -12,23 +12,24 @@
     <div class="info" v-if="CheckListData.Name">
       <h3>{{CheckListData.Name}}:</h3>
       <p>{{CheckListData.Desc}}</p>
+
+      <div class="button-container">
+        <span
+          v-for="item in CheckListData.Data"
+          :key="item"
+          class="nav-item"
+        >
+          <button
+            type="button"
+            class="btn btn-secondary"
+            :class="{'active': selected === item.Title}"  
+            @click="selected = item.Title">
+            {{item.Title}}
+          </button>
+        </span>
+      </div>
     </div>
 
-
-    <ul class="nav nav-tabs" v-if="CheckListData.Data">
-      <li
-        v-for="item in CheckListData.Data"
-        :key="item"
-        class="nav-item"
-      >
-        <span
-          class="nav-link"
-          :class="{active: selected === item.Title}"  
-          @click="selected = item.Title">
-          {{item.Title}}
-        </span>
-      </li>
-    </ul>
 
     <div class="checklist-container" v-if="CheckListData.Data">
       <div 
@@ -130,7 +131,6 @@ export default {
         this.loadingError = true
       })
   },
-
   methods: {
     getPercentage(partialValue, totalValue) {
       return (100 * partialValue) / totalValue;
@@ -183,24 +183,7 @@ export default {
 
 <style lang="scss" scoped>
   @import "../assets/vars.scss";
-
-  .pre-loader {
-    height: 100px;
-    background: #fff;
-    border-radius: 6px;
-    align-items: center;
-    flex-direction: column;
-    opacity: 0.8;
-    position: fixed;
-    width: 300px;
-    height: 160px;
-    top: calc(50% - 80px);
-    left: calc(50% - 150px);
-    p {
-      font-size: 1em;
-      margin: 20px 0 0 0;
-    }
-  }
+  @import "../assets/common.scss";
 
   .checklist-main {
     background: #fff;
@@ -208,7 +191,7 @@ export default {
     overflow: hidden;
 
     .info {
-      padding: 60px 20px;
+      padding: 60px 0 40px 0;
       background: $brand-blue;
       color: $color-white;
 
@@ -219,16 +202,21 @@ export default {
         padding: 0;
         margin: 0;
       }
-    }
 
-    .nav-tabs {
-      background: $color-grey;
-      padding: 20px 0 0 0;
-
-    }
-
-    .checklist-container {
-      padding: 20px;
+      .button-container {
+        padding: 20px 0 0 0;
+        
+        button {
+          margin: 0 10px;
+          border: 1px solid #fff;
+          background: none;
+          &:hover, &.active {
+            background: $color-white;
+            color: $brand-blue-dark;
+            transition: all 0.2s;
+          }
+        }
+      }
     }
 
     .checklist {
@@ -241,7 +229,7 @@ export default {
           text-align: left;
           padding: 10px 20px;
           margin: 0;
-          background: $brand-dark;
+          background: $color-steel;
           font-weight: 600;
           color: #fff;
           position: relative;
@@ -293,6 +281,7 @@ export default {
           position: relative;
           z-index: 0;
           opacity: 0;
+          background: $color-white;
           transition: all 0.6s ease-in-out;
 
           &.visible {
@@ -335,6 +324,12 @@ export default {
           }
         }
       }
+
+      .form-check-input:checked {
+        background-color: $brand-blue;
+        border-color: $brand-blue;
+      }
+
     }
   }
 

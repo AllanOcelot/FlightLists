@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
+import List from '../views/List.vue'
+import Create from '../views/CreateChecklist.vue'
 import ChecklistPage from '../views/ChecklistPage.vue'
 
 const routes = [
@@ -9,6 +11,17 @@ const routes = [
     component: Home
   },
   {
+    path: '/List',
+    name: 'List',
+    component: List
+  },
+  {
+    path: '/Create',
+    name: 'Create',
+    component: Create
+  },
+
+  {
     path: '/about',
     name: 'About',
     // route level code-splitting
@@ -17,8 +30,8 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   },
   {
-    path: '/checklist/:id',
-    name: 'checklist view',
+    path: '/Checklist/:id',
+    name: 'Checklist',
     component: ChecklistPage,
     props: true
   }

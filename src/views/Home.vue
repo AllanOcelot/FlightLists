@@ -51,13 +51,7 @@ export default {
 };
 </script>
 
-<style scoped>
- .introduction-banner {
-    min-height: 300px;
-    background: #fff;
-    justify-content: center;
-    align-items: center;
-    display: flex;
-    margin-bottom: 40px;
- }
+<style lang="scss" scoped>
+    @import "../assets/vars.scss";
+    @import "../assets/common.scss";
 </style>

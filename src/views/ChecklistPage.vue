@@ -1,11 +1,5 @@
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col">
-        <Checklist :id="1"/>
-      </div>
-    </div>
-  </div>
+  <Checklist :id="1"/>
 </template>
 
 <script>
