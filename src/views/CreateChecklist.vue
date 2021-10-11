@@ -23,6 +23,8 @@
               <input type="text" class="form-control" :id="defaultData.Desc" v-model="defaultData.Desc">
 
 
+              <p>Selected: {{selected}}</p>
+
               <div class="type-selection">
                 <p class="title">Type To Edit:</p>
                   <button type="button" class="btn btn-outline-secondary"
@@ -44,24 +46,43 @@
 
 
               <div v-for="data in defaultData.Data" :key="data.Name">
-                <label :for="data.Title" class="form-label">Section Name:</label>
-                <input type="email" class="form-control" :id="data.Title" v-model="data.Title">
+                <div v-if="selected === data.Title">
+                  <label :for="data.Title" class="form-label">Section Name:</label>
+                  <input type="text" class="form-control" :id="data.Title" v-model="data.Title">
+
+                
+                  <div class="type" v-for="type in data.Data" :key="type.Title">
+                    {{type}}
+
+                    <label :for="type.Title" class="form-label">Sub Section Name:</label>
+                    <input type="text" class="form-control" :id="type.Title" v-model="type.Title">
 
 
-
-                <div class="type" v-for="type in data.Data" :key="type.Title">
-                  <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-                    <div class="section" v-for="section in type.Data" :key="section.Title">
-                      <div class="item" v-for="item in section.Data" :key="item.Name">
+                      <div class="section" v-for="section in type.Data" :key="section.Title">
+                        <div class="item" v-for="item in section.Data" :key="item.Name">
+                        </div>
+                        <!-- <button type="button" class="btn btn-primary">Add Item</button> -->
                       </div>
-                      <button type="button" class="btn btn-primary">Add Item</button>
-                    </div>
-                    <button type="button" class="btn btn-primary">Add Section</button>
+                      <!-- <button type="button" class="btn btn-primary">Add Section</button> -->
+                  </div>
+
+                  <button 
+                    type="button" 
+                    class="btn btn-outline-secondary add"
+                    @click="addSection()"
+                  >
+                    Add Section
+                    <i class="bi bi-plus"></i>
+                  </button>
                 </div>
+
+
+
+
+
+
+
               </div>
-
-
-
           </div>
         </div>
       </div>
@@ -89,7 +110,7 @@ export default {
           "Data": 
           [
             {
-              "Title": "Exampl: Cabin",
+              "Title": "Example: Cabin",
               "Hidden": true,
               "Data": 
               [
@@ -111,7 +132,7 @@ export default {
   },
   methods: {
     addType(){
-      let newData = {
+      const newData = {
           "Title": "Enter Section Name",
           "Desc": "Enter Section Description",
           "Completed": false,
@@ -131,10 +152,42 @@ export default {
               }
             ]
           }
-      ]}
-
+      ]
+      }
       this.defaultData.Data.push(newData)
-    }
+    },
+
+
+    addSection(){
+      const newData =       
+      {
+        "Title": "Example: Cabin",
+        "Hidden": true,
+        "Data": 
+        [
+          {
+            "Name": "Example: Documents",
+            "Type": "Text",
+            "Value": false,
+            "ToDo": "Example: A.R.R.O.W",
+            "Desc": "Example: Remember to check A.R.R.O.W"
+          }
+        ]
+      }
+      
+
+    // Get the selection checlist Type,
+    // Then add the new section to that.
+    let ChecklistToEdit = this.defaultData.Data.filter(obj => {
+      return obj.Title === this.selected
+    })
+    console.log(newData)
+    console.log(ChecklistToEdit)
+    ChecklistToEdit[0].Data.push(newData)
+
+    //this.defaultData.Data.push(newData)
+
+    },
   }
 };
 </script>
