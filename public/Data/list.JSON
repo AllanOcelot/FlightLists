@@ -1,5 +1,4 @@
-{
-  "Data" : [
+ [
     {
       "ID": "01",
       "Name": "Cessna 172",
@@ -7,4 +6,3 @@
       "Filename": "cessna_172"
     }
   ]
-}
