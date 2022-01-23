@@ -1,6 +1,6 @@
 {
   "name": "FlightLists",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
+    "@storybook/preset-scss": "^1.0.3",
     "axios": "^0.22.0",
     "bootstrap": "^5.1.2",
     "bootstrap-icons": "^1.5.0",
@@ -21,6 +22,11 @@
     "vue-router": "^4.0.0-0"
   },
   "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@storybook/addon-actions": "^6.3.12",
+    "@storybook/addon-essentials": "^6.3.12",
+    "@storybook/addon-links": "^6.3.12",
+    "@storybook/vue3": "^6.3.12",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-router": "^4.5.13",
@@ -29,6 +35,7 @@
     "@vue/compiler-sfc": "^3.0.0",
     "@vue/test-utils": "^2.0.0-rc.15",
     "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.2.3",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^7.0.0",
     "node-sass": "^6.0.1",
@@ -36,7 +43,8 @@
     "sass-loader": "^10.2.0",
     "typescript": "~3.9.3",
     "vue-cli-plugin-vuetify": "~2.4.2",
-    "vue-jest": "^5.0.0-0"
+    "vue-jest": "^5.0.0-0",
+    "vue-loader": "^16.8.3"
   },
   "eslintConfig": {
     "root": true,
