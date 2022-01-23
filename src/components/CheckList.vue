@@ -1,27 +1,24 @@
 <template>
-  <div
-    class="d-flex justify-content-center pre-loader"
-    v-if="loading === true || loadingError === true"
-  >
-    <div class="spinner-border" role="status" v-if="!loadingError">
-      <span class="sr-only"></span>
-    </div>
-    <p v-if="!loadingError">Now Loading, please wait...</p>
-    <p v-else>There was an error loading this data</p>
-    <router-link to="/">Return Home</router-link>
-  </div>
-
   <div class="checklist-main">
-    <div class="info" v-if="CheckListData.Name">
-      <h3>{{ CheckListData.Name }}:</h3>
-      <p>{{ CheckListData.Desc }}</p>
+    <div class="info" v-if="checklistData.Name">
+      <h3>{{ checklistData.Name }}:</h3>
+      <p>{{ checklistData.Desc }}</p>
     </div>
 
-    <div class="checklist-container" v-if="CheckListData.Data">
+    <div class="d-flex justify-content-center pre-loader" v-if="loading === true">
+      <div class="spinner-border" role="status">
+        <span class="sr-only"></span>
+      </div>
+      <p v-if="!checklistData">Now Loading, please wait...</p>
+      <p v-else>There was an error loading this data</p>
+      <router-link to="/">Return Home</router-link>
+    </div>
+
+    <div class="checklist-container" v-if="checklistData.Data">
       <div class="d-flex">
         <div class="button-container">
           <p>Section:</p>
-          <ul class="selection" v-for="item in CheckListData.Data" :key="item">
+          <ul class="selection" v-for="item in checklistData.Data" :key="item.Title">
             <li :class="{ 'active': selected === item.Title }" @click="selected = item.Title">
               >
               {{ item.Title }}
@@ -31,11 +28,11 @@
 
         <div
           class="flex-fill checklist"
-          v-for="checklist in CheckListData.Data"
+          v-for="checklist in checklistData.Data"
           :key="checklist.Title"
         >
           <div v-if="selected === checklist.Title">
-            <div class="checklist-parent" v-for="item in checklist.Data" :key="item">
+            <div class="checklist-parent" v-for="item in checklist.Data" :key="item.Title">
               <div class="title">
                 <span>{{ item.Title }} :</span>
                 <div
@@ -93,58 +90,77 @@
 <script lang="ts">
 import axios from "axios";
 import { useRoute } from 'vue-router';
+import { defineComponent, ref, onMounted } from "vue";
 
-export default {
-  name: 'CheckList',
-  props: {
-    id: Number
-  },
-  data: function () {
-    return {
-      loading: true,
-      loadingError: false,
-      selected: 'Preflight',
-      CheckListData: {}
-    }
-  },
-  mounted() {
-    // Get the ID from our Route
-    const route = useRoute();
+export default defineComponent({
+  setup() {
+    let loading = ref(true)
 
-    console.log('--------------')
-    console.log(route.params.id)
-    console.log('--------------')
+    const route = useRoute()
+    const dataID = route.params.id
 
-    const dataID = route.params.id;
+    let selected = ref('Preflight')
+    let checklistData = ref({
+      ID: 0,
+      Name: '',
+      Desc: '',
+      Progress: 0,
+      Data: [{
+        Title: '',
+        Progress: 0,
+        Data: [{
+          Title: '',
+          Hidden: false,
+          Progress: 0,
+          Data: [{
+            Name: '',
+            Type: '',
+            Value: false,
+            ToDo: '',
+            Desc: ''
+          }]
+        }]
+      }]
+    })
+
 
     // Request the Data.
-    axios
-      .get("/data/" + dataID + ".json")
-      .then(response => {
-        this.loading = false
-        this.CheckListData = response.data
-
-        console.log(this.CheckListData.Data[0])
-        if (this.CheckListData.Data[0]) {
-          this.selected = this.CheckListData.Data[0].Title
-          this.CheckListData.Data[0].Data[0].Hidden = false
+    const getChecklist = async () => {
+      try {
+        const response = await axios.get("/data/" + dataID + ".json")
+        checklistData.value = response.data
+        if (checklistData.value.Data[0]) {
+          selected.value = checklistData.value.Data[0].Title
+          checklistData.value.Data[0].Data[0].Hidden = false
         }
+      } catch (err) {
+        console.log('There was an error fetching the Checklist with ID ' + dataID + ' | Error : ' + err)
+        selected.value = 'error'
+      } finally {
+        loading.value = false
+      }
+    }
 
-      }).catch(error => {
-        console.log('Error in console ' + error)
-        this.loadingError = true
-      })
+    onMounted(getChecklist)
+
+
+    return {
+      loading,
+      selected,
+      checklistData
+    }
   },
   methods: {
-    getPercentage(partialValue, totalValue) {
+    getPercentage(partialValue: number, totalValue: number) {
       return (100 * partialValue) / totalValue;
     },
 
     // Update the progress of the current checklist here.
-    updateProgress(Checklist, Parent) {
+    updateProgress(Checklist: any, Parent: any) {
+      //let checkList = this.checklistData;
 
       // Ensure we are working on the correct Checklist.
-      let ChecklistData = this.CheckListData.Data.filter(obj => {
+      let ChecklistData = this.checklistData.Data.filter(obj => {
         return obj.Title === Checklist.Title
       })
 
@@ -161,6 +177,7 @@ export default {
 
       // Finally, we can query our ChecklistChildData, to see how many have been completed 
       let ChecklistChildCompleted = ChecklistChildData[0].Data.filter(obj => {
+        console.log('obj value is ' + obj.Value)
         return obj.Value === true
       })
 
@@ -180,9 +197,8 @@ export default {
 
 
     }
-
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>
