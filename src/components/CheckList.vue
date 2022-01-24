@@ -1,84 +1,75 @@
 <template>
+  <!-- Pre Loader -->
+  <div class="d-flex justify-content-center pre-loader" v-if="loading === true">
+    <div class="spinner-border" role="status">
+      <span class="sr-only"></span>
+    </div>
+    <p v-if="!checklistData">Now Loading, please wait...</p>
+    <p v-else>There was an error loading this data</p>
+    <router-link to="/">Return Home</router-link>
+  </div>
+
   <div class="checklist-main">
-    <div class="info" v-if="checklistData.Name">
-      <h3>{{ checklistData.Name }}:</h3>
-      <p>{{ checklistData.Desc }}</p>
-    </div>
-
-    <div class="d-flex justify-content-center pre-loader" v-if="loading === true">
-      <div class="spinner-border" role="status">
-        <span class="sr-only"></span>
-      </div>
-      <p v-if="!checklistData">Now Loading, please wait...</p>
-      <p v-else>There was an error loading this data</p>
-      <router-link to="/">Return Home</router-link>
-    </div>
-
-    <div class="checklist-container" v-if="checklistData.Data">
-      <div class="d-flex">
-        <div class="button-container">
-          <p>Section:</p>
-          <ul class="selection" v-for="item in checklistData.Data" :key="item.Title">
-            <li :class="{ 'active': selected === item.Title }" @click="selected = item.Title">
-              >
-              {{ item.Title }}
-            </li>
+    <div class="d-flex content-container" v-if="checklistData.Data">
+      <div class="section-container">
+        <h3>{{ checklistData.Name }}:</h3>
+        <small>Author: {{ checklistData.Author }}, Last edit: {{ checklistData.Date }}</small>
+        <hr />
+        <h3>Sections:</h3>
+        <div class="section" v-for="item in checklistData.Data" :key="item.Title">
+          <p>{{ item.Title }}</p>
+          <ul>
+            <li v-for="checklist in item.Data" :key="checklist.Title">{{ checklist.Title }}</li>
           </ul>
         </div>
+      </div>
 
-        <div
-          class="flex-fill checklist"
-          v-for="checklist in checklistData.Data"
-          :key="checklist.Title"
-        >
-          <div v-if="selected === checklist.Title">
-            <div class="checklist-parent" v-for="item in checklist.Data" :key="item.Title">
-              <div class="title">
-                <span>{{ item.Title }} :</span>
-                <div
-                  class="progress-bar"
-                  :style="{ 'width': item.Progress + '%' }"
-                  :class="{ complete: item.Progress === 100 }"
-                ></div>
-                <span class="checklist-toggle" @click="item.Hidden = !item.Hidden">
-                  <i class="bi bi-arrows-expand" v-if="item.Hidden"></i>
-                  <i class="bi bi-arrows-collapse" v-else></i>
-                </span>
-              </div>
-
-              <div class="checklist-section" :class="{ visible: !item.Hidden }">
-                <transition-group name="slide-fade">
-                  <div v-if="!item.Hidden">
-                    <div
-                      class="checklist-items"
-                      v-for="checklistItem in item.Data"
-                      :key="checklistItem.Name"
-                    >
-                      <div class="form-check form-switch">
-                        <label class="form-check-label" :for="checklistItem.Name">
-                          <span>{{ checklistItem.Name }}</span>
-                          <br />
-                          <small v-if="checklistItem.Desc.length > 1">{{ checklistItem.Desc }}</small>
-                          <small v-else>&nbsp;</small>
-                        </label>
-                        <input
-                          class="form-check-input"
-                          type="checkbox"
-                          role="switch"
-                          :id="checklistItem.Name"
-                          v-model="checklistItem.Value"
-                          v-on:change="updateProgress(checklist, item)"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </transition-group>
-              </div>
+      <div
+        class="flex-fill checklist"
+        v-for="checklist in checklistData.Data"
+        :key="checklist.Title"
+      >
+        <div v-if="selected === checklist.Title">
+          <div class="checklist-parent" v-for="item in checklist.Data" :key="item.Title">
+            <div class="title" @click="item.Hidden = !item.Hidden">
+              <span>{{ item.Title }} :</span>
+              <span class="checklist-toggle">
+                <i class="bi bi-arrows-expand" v-if="item.Hidden"></i>
+                <i class="bi bi-arrows-collapse" v-else></i>
+              </span>
+              <span
+                class="progress-bar"
+                :style="{ 'width': item.Progress + '%' }"
+                :class="{ complete: item.Progress === 100 }"
+              ></span>
             </div>
 
-            <div class="checklist-progress">
-              <p class="title">Progress:</p>
-              <span class="progress-bar"></span>
+            <div class="checklist-section" :class="{ visible: !item.Hidden }">
+              <transition-group name="slide-fade">
+                <div v-if="!item.Hidden">
+                  <div
+                    class="checklist-items"
+                    v-for="checklistItem in item.Data"
+                    :key="checklistItem.Name"
+                  >
+                    <div class="form-check">
+                      <label class="form-check-label" :for="checklistItem.Name">
+                        <span>{{ checklistItem.Name }}</span>
+                        <br />
+                        <small v-if="checklistItem.Desc.length > 1">{{ checklistItem.Desc }}</small>
+                        <small v-else>&nbsp;</small>
+                      </label>
+                      <input
+                        class="form-check-input lrg"
+                        type="checkbox"
+                        :id="checklistItem.Name"
+                        v-model="checklistItem.Value"
+                        v-on:change="updateProgress(checklist, item)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </transition-group>
             </div>
           </div>
         </div>
@@ -104,6 +95,8 @@ export default defineComponent({
       ID: 0,
       Name: '',
       Desc: '',
+      Author: '',
+      Date: '01/01/01',
       Progress: 0,
       Data: [{
         Title: '',
@@ -131,7 +124,7 @@ export default defineComponent({
         checklistData.value = response.data
         if (checklistData.value.Data[0]) {
           selected.value = checklistData.value.Data[0].Title
-          checklistData.value.Data[0].Data[0].Hidden = false
+          //checklistData.value.Data[0].Data[0].Hidden = false
         }
       } catch (err) {
         console.log('There was an error fetching the Checklist with ID ' + dataID + ' | Error : ' + err)
@@ -157,8 +150,6 @@ export default defineComponent({
 
     // Update the progress of the current checklist here.
     updateProgress(Checklist: any, Parent: any) {
-      //let checkList = this.checklistData;
-
       // Ensure we are working on the correct Checklist.
       let ChecklistData = this.checklistData.Data.filter(obj => {
         return obj.Title === Checklist.Title
@@ -172,12 +163,11 @@ export default defineComponent({
       let ChecklistChildIndex = ChecklistData[0].Data.findIndex(obj => obj.Title === Parent.Title
       );
 
-      // How many checkboxes are there, in this checklist section?
+      // How many checkboxes are there, in this child checklist.
       const lengthOfCheckItems = ChecklistChildData[0].Data.length;
 
       // Finally, we can query our ChecklistChildData, to see how many have been completed 
       let ChecklistChildCompleted = ChecklistChildData[0].Data.filter(obj => {
-        console.log('obj value is ' + obj.Value)
         return obj.Value === true
       })
 
@@ -191,17 +181,13 @@ export default defineComponent({
           ChecklistData[0].Data[ChecklistChildIndex + 1].Hidden = false;
         }
       }
-
-      // TODO, 
-      // Maybe track how far through the entire checklist the user is. This might be overkill.
-
-
     }
   }
 })
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/vars";
 @import "../assets/vars";
 @import "../assets/vars.scss";
 @import "../assets/common.scss";
@@ -210,14 +196,20 @@ export default defineComponent({
   background: #fff;
   margin-bottom: 50px;
   overflow: hidden;
+  position: relative;
+  z-index: 0;
+  min-height: calc(100% - 58px);
+  display: flex;
+  flex-direction: column;
 
-  .selection-container {
+  .content-container {
+    flex: 1;
   }
 
   .info {
     padding: 60px 0 40px 0;
-    background: $brand-blue;
-    color: $color-white;
+    background: $color-grey;
+    color: $color-text-dark;
 
     h3 {
       margin: 0;
@@ -228,7 +220,17 @@ export default defineComponent({
     }
   }
 
+  .section-container {
+    text-align: left;
+    width: 25%;
+    padding: 20px;
+    h3 {
+      margin: 0;
+    }
+  }
+
   .checklist {
+    background: $color-grey;
     .checklist-parent {
       background: $color-grey;
       border-bottom: 1px solid #d9d9d9;
@@ -238,11 +240,12 @@ export default defineComponent({
         text-align: left;
         padding: 10px 20px;
         margin: 0;
-        background: $color-steel;
+        background: $brand-blue;
         font-weight: 600;
         color: #fff;
         position: relative;
         z-index: 10;
+        cursor: pointer;
 
         span {
           z-index: 1;
@@ -290,7 +293,6 @@ export default defineComponent({
         position: relative;
         z-index: 0;
         opacity: 0;
-        background: $color-white;
         transition: all 0.6s ease-in-out;
 
         &.visible {
@@ -300,7 +302,7 @@ export default defineComponent({
 
         .checklist-items {
           padding-bottom: 20px;
-          .form-switch {
+          .form-check {
             display: flex;
             align-items: center;
             padding: 0;
@@ -317,6 +319,9 @@ export default defineComponent({
             input {
               float: right;
               cursor: pointer;
+              margin-left: auto;
+              width: 34px;
+              height: 34px;
             }
           }
         }
@@ -335,8 +340,8 @@ export default defineComponent({
     }
 
     .form-check-input:checked {
-      background-color: $brand-blue;
-      border-color: $brand-blue;
+      background-color: $brand-green;
+      border-color: $brand-green;
     }
   }
 }
@@ -355,7 +360,7 @@ export default defineComponent({
     height: 10px;
     float: left;
     width: 0;
-    background: green;
+    background: $brand-green;
   }
 }
 
@@ -367,9 +372,6 @@ export default defineComponent({
 
 .slide-fade-leave-active {
   transition: all 0.4s cubic-bezier(1, 0.5, 0.8, 1);
-}
-
-.slide-fade-leave-to {
 }
 
 .slide-fade-enter-from,

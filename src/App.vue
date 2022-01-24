@@ -1,7 +1,7 @@
 <template>
   <Header />
   <transition name="fade">
-    <router-view/>
+    <router-view />
   </transition>
 </template>
 
@@ -21,29 +21,29 @@ export default {
 <style lang="scss">
 @import "./assets/vars.scss";
 
-  body {
-    background-color: $color-grey;
-    min-height: 100vh;
-    display: flex;
-  }
+body {
+  background-color: $color-grey;
+  min-height: 100vh;
+  display: flex;
+}
 
-  #app {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    flex: 1;
-  }
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  flex: 1;
+  position: relative;
+}
 
-  .fade-enter-active,
-  .fade-leave-active {
-    transition: opacity 0.5s ease;
-  }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
 
-
-  .fade-enter-from,
-  .fade-leave-to {
-    opacity: 0;
-  }
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

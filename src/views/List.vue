@@ -1,19 +1,4 @@
 <template>
-  <div class="introduction-banner left">
-    <div class="container">
-      <div class="row">
-        <div class="col">
-          <h1>List of Aircraft:</h1>
-          <p>
-            Below you can find the list of Aircraft we have checklists for and those we are working on!
-            <br />You can always
-            <router-link to="contribute">contribute</router-link>your own checklists to FlightLists!
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  {{ ListData }}
   <div
     class="d-flex justify-content-center pre-loader"
     v-if="loading === true || ListData.length == 0"
@@ -24,6 +9,15 @@
     <p v-if="loading">Now Loading, please wait...</p>
     <p v-else>There was an error loading this data</p>
     <router-link to="/">Return Home</router-link>
+  </div>
+
+  <div class="introduction-banner left">
+    <h1>List of Aircraft:</h1>
+    <p>
+      Below you can find the list of Aircraft we have checklists for and those we are working on!
+      <br />You can always
+      <router-link to="contribute">contribute</router-link>&nbsp; your own checklists to FlightLists!
+    </p>
   </div>
 
   <div class="list-container" v-if="!loading && ListData.length > 0">

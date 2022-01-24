@@ -2,8 +2,9 @@
   "ID": 1,
   "Name": "Cessna 172",
   "Desc": "A short description here, summarise the Cessna 172 checklist",
-  "Data": 
-  [
+  "Author": "AllanCodes",
+  "Date": "24/01/22",
+  "Data": [
     {
       "Title": "PreFlight",
       "Desc": "example text to go here, example text to go here, example text to go here",
