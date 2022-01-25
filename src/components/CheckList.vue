@@ -1,28 +1,34 @@
 <template>
-  <Preloader :loading="loading" :error="loadingError" />
+  <div class="transitional-ref">
+    <Preloader :loading="loading" :error="loadingError" />
 
-  <div class="checklist-main">
-    <div class="d-flex content-container" v-if="checklistData.Data">
-      <div class="section-container">
-        <h3>{{ checklistData.Name }}:</h3>
-        <small>Author: {{ checklistData.Author }}, Last edit: {{ checklistData.Date }}</small>
-        <hr />
-        <h3>Sections:</h3>
-        <div class="section" v-for="item in checklistData.Data" :key="item.Title">
-          <p>{{ item.Title }}</p>
+    <div class="checklist-main">
+      <div class="d-flex content-container" v-if="checklistData.Data">
+        <div class="section-container">
+          <h3>{{ checklistData.Name }}:</h3>
+          <small>Author: {{ checklistData.Author }}, Last edit: {{ checklistData.Date }}</small>
+          <hr />
           <ul>
-            <li v-for="checklist in item.Data" :key="checklist.Title">{{ checklist.Title }}</li>
+            <li
+              v-for="section in checklistData.Data"
+              :key="section.Title"
+              @click="selected = section.Title"
+            >
+              <span class="visible-icon visible" v-if="selected === section.Title">
+                <i class="bi bi-eye-fill"></i>
+              </span>
+              <span v-else>
+                <i class="bi bi-eye-slash-fill"></i>
+              </span>
+              {{ section.Title }}
+              <span
+                class="section-progress"
+              >{{ section.Completed }}/{{ section.Data.length }}</span>
+            </li>
           </ul>
         </div>
-      </div>
-
-      <div
-        class="flex-fill checklist"
-        v-for="checklist in checklistData.Data"
-        :key="checklist.Title"
-      >
-        <div v-if="selected === checklist.Title">
-          <div class="checklist-parent" v-for="item in checklist.Data" :key="item.Title">
+        <div class="flex-fill checklist">
+          <div class="checklist-parent" v-for="item in selectedChecklist.Data" :key="item.Title">
             <div class="title" @click="item.Hidden = !item.Hidden">
               <span>{{ item.Title }} :</span>
               <span class="checklist-toggle">
@@ -56,7 +62,7 @@
                         type="checkbox"
                         :id="checklistItem.Name"
                         v-model="checklistItem.Value"
-                        v-on:change="updateProgress(checklist, item)"
+                        v-on:change="updateProgress(selectedChecklist, item)"
                       />
                     </div>
                   </div>
@@ -74,7 +80,7 @@
 import Preloader from "@/components/PreLoader.vue"
 import axios from "axios"
 import { useRoute } from 'vue-router'
-import { defineComponent, ref, onMounted } from "vue"
+import { defineComponent, ref, onMounted, watch } from "vue"
 
 export default defineComponent({
   components: {
@@ -87,7 +93,10 @@ export default defineComponent({
     const route = useRoute()
     const dataID = route.params.id
 
+    //What 'stage' is selected, i.e 'engine warm up' etc
     let selected = ref('Preflight')
+    let selectedChecklist = ref({})
+
     let checklistData = ref({
       ID: 0,
       Name: '',
@@ -97,7 +106,7 @@ export default defineComponent({
       Progress: 0,
       Data: [{
         Title: '',
-        Progress: 0,
+        Completed: 0,
         Data: [{
           Title: '',
           Hidden: false,
@@ -134,11 +143,26 @@ export default defineComponent({
 
     onMounted(getChecklist)
 
+    // Watch the selection for change, as we need to display a difference Checklist 
+    watch(selected, (newVal, prevVal) => {
+      if (newVal != prevVal) {
+        selected.value = newVal
+        selectedChecklist.value = getMatchingChecklist()
+      }
+    })
+
+    let getMatchingChecklist = function () {
+      let checkList = checklistData.value.Data.filter((obj: any) => {
+        return obj.Title === selected.value
+      })
+      return checkList[0];
+    }
 
     return {
       loading,
       loadingError,
       selected,
+      selectedChecklist,
       checklistData
     }
   },
@@ -147,12 +171,15 @@ export default defineComponent({
       return (100 * partialValue) / totalValue;
     },
 
+
     // Update the progress of the current checklist here.
     updateProgress(Checklist: any, Parent: any) {
       // Ensure we are working on the correct Checklist.
+      // Gives us back an array of checklsits matching the current 'selection'
       let ChecklistData = this.checklistData.Data.filter(obj => {
         return obj.Title === Checklist.Title
       })
+
 
       // Ensure we are working on the right 'section' of the current Playlist.
       let ChecklistChildData = ChecklistData[0].Data.filter(obj => {
@@ -173,14 +200,22 @@ export default defineComponent({
       // Update our values. 
       let PercentComplete = this.getPercentage(ChecklistChildCompleted.length, lengthOfCheckItems);
       Parent.Progress = PercentComplete;
+
+      // keep track of how many Checklists, in each section, are completed.
+      let checkListsComplete = ChecklistData[0].Data.filter((obj: any) => {
+        return obj.Progress === 100
+      })
+
+      ChecklistData[0].Completed = checkListsComplete.length
+
       if (PercentComplete === 100) {
-        Parent.Hidden = true;
+        Parent.Hidden = true
         // check if the next index exists & is hidden, if it is, show it
         if (ChecklistData[0].Data[ChecklistChildIndex + 1] && ChecklistData[0].Data[ChecklistChildIndex + 1].Hidden === true) {
           ChecklistData[0].Data[ChecklistChildIndex + 1].Hidden = false;
         }
       }
-    }
+    },
   }
 })
 </script>
@@ -191,13 +226,18 @@ export default defineComponent({
 @import "../assets/vars.scss";
 @import "../assets/common.scss";
 
+.transitional-ref {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
 .checklist-main {
   background: #fff;
-  margin-bottom: 50px;
   overflow: hidden;
   position: relative;
   z-index: 0;
-  min-height: calc(100% - 58px);
+  flex: 1;
   display: flex;
   flex-direction: column;
 
@@ -225,6 +265,23 @@ export default defineComponent({
     padding: 20px;
     h3 {
       margin: 0;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      li {
+        width: 100%;
+        padding: 0;
+        color: $brand-dark;
+        font-size: 1.2rem;
+        p {
+          &.active {
+            background: $brand-blue;
+            color: $color-white;
+          }
+        }
+      }
     }
   }
 
@@ -371,6 +428,10 @@ export default defineComponent({
 
 .slide-fade-leave-active {
   transition: all 0.4s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-move {
+  transition: transform 0.8s ease;
 }
 
 .slide-fade-enter-from,
