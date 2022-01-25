@@ -1,13 +1,5 @@
 <template>
-  <!-- Pre Loader -->
-  <div class="d-flex justify-content-center pre-loader" v-if="loading === true">
-    <div class="spinner-border" role="status">
-      <span class="sr-only"></span>
-    </div>
-    <p v-if="!checklistData">Now Loading, please wait...</p>
-    <p v-else>There was an error loading this data</p>
-    <router-link to="/">Return Home</router-link>
-  </div>
+  <Preloader :loading="loading" :error="loadingError" />
 
   <div class="checklist-main">
     <div class="d-flex content-container" v-if="checklistData.Data">
@@ -79,13 +71,18 @@
 </template>
 
 <script lang="ts">
-import axios from "axios";
-import { useRoute } from 'vue-router';
-import { defineComponent, ref, onMounted } from "vue";
+import Preloader from "@/components/PreLoader.vue"
+import axios from "axios"
+import { useRoute } from 'vue-router'
+import { defineComponent, ref, onMounted } from "vue"
 
 export default defineComponent({
+  components: {
+    Preloader
+  },
   setup() {
     let loading = ref(true)
+    let loadingError = ref(false)
 
     const route = useRoute()
     const dataID = route.params.id
@@ -129,6 +126,7 @@ export default defineComponent({
       } catch (err) {
         console.log('There was an error fetching the Checklist with ID ' + dataID + ' | Error : ' + err)
         selected.value = 'error'
+        loadingError.value = true
       } finally {
         loading.value = false
       }
@@ -139,6 +137,7 @@ export default defineComponent({
 
     return {
       loading,
+      loadingError,
       selected,
       checklistData
     }

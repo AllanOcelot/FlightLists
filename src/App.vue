@@ -3,16 +3,19 @@
   <transition name="fade">
     <router-view />
   </transition>
+  <Footer />
 </template>
 
 
 <script>
 import Header from '@/components/Header.vue'
+import Footer from '@/components/Footer.vue'
 
 export default {
   name: 'App',
   components: {
-    Header
+    Header,
+    Footer
   }
 }
 </script>
@@ -34,6 +37,8 @@ body {
   text-align: center;
   color: #2c3e50;
   flex: 1;
+  display: flex;
+  flex-direction: column;
   position: relative;
 }
 

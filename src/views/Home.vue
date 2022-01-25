@@ -1,46 +1,14 @@
 <template>
-  <div class="introduction-banner">
-    <div class="container">
-      <div class="row">
-        <div class="col">
-          <h1>Welcome to FlightLists!</h1>
-          <p>Flightlists is a free to use, open source, aircraft checklist tool for use in Flight Simulations.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="intro-content container">
-    <div class="row">
-      <div class="col-sm">
-        <div class="card" style="width: 18rem;">
-          <img src="..." class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm">
-        <div class="card" style="width: 18rem;">
-          <img src="..." class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm">
-        <div class="card" style="width: 18rem;">
-          <img src="..." class="card-img-top" alt="...">
-          <div class="card-body">
-            <h5 class="card-title">Card title</h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-          </div>
-        </div>
-      </div>
+  <div class="introduction-banner height-full margin-none overlay">
+    <h1>Welcome to FlightLists!</h1>
+    <p>Flightlists is an open source, community generated, aircraft checklist tool for use in Flight Simulators.</p>
+    <div class="actions">
+      <router-link to="/list">
+        <button type="button" class="btn btn-lg">View All</button>
+      </router-link>
+      <router-link to="/create">
+        <button type="button" class="btn btn-lg">Create Checklist</button>
+      </router-link>
     </div>
   </div>
 </template>
@@ -52,6 +20,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    @import "../assets/vars.scss";
-    @import "../assets/common.scss";
+@import "../assets/vars.scss";
+@import "../assets/common.scss";
+
+.introduction-banner {
+  background-image: url("/assets/images/bg1.png");
+}
 </style>
