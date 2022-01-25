@@ -8,16 +8,19 @@
           <h3>{{ checklistData.Name }}:</h3>
           <small>Author: {{ checklistData.Author }}, Last edit: {{ checklistData.Date }}</small>
           <hr />
+          <p v-if="checklistData.Desc">{{ checklistData.Desc }}</p>
+          <hr />
           <ul>
             <li
               v-for="section in checklistData.Data"
               :key="section.Title"
               @click="selected = section.Title"
+              :class="{ active: selected === section.Title }"
             >
-              <span class="visible-icon visible" v-if="selected === section.Title">
+              <span class="visible-icon" v-if="selected === section.Title">
                 <i class="bi bi-eye-fill"></i>
               </span>
-              <span v-else>
+              <span class="visible-icon" v-else>
                 <i class="bi bi-eye-slash-fill"></i>
               </span>
               {{ section.Title }}
@@ -28,41 +31,46 @@
           </ul>
         </div>
         <div class="flex-fill checklist">
-          <div class="checklist-parent" v-for="item in selectedChecklist.Data" :key="item.Title">
-            <div class="title" @click="item.Hidden = !item.Hidden">
-              <span>{{ item.Title }} :</span>
+          <div
+            class="checklist-parent"
+            v-for="section in selectedChecklist.Data"
+            :key="section.Title"
+          >
+            <div class="title" @click="section.Hidden = !section.Hidden">
+              <span>{{ section.Title }} :</span>
               <span class="checklist-toggle">
-                <i class="bi bi-arrows-expand" v-if="item.Hidden"></i>
+                <i class="bi bi-arrows-expand" v-if="section.Hidden"></i>
                 <i class="bi bi-arrows-collapse" v-else></i>
               </span>
               <span
                 class="progress-bar"
-                :style="{ 'width': item.Progress + '%' }"
-                :class="{ complete: item.Progress === 100 }"
+                v-if="section.Progress"
+                :style="{ 'width': section.Progress + '%' }"
+                :class="{ complete: section.Progress === 100 }"
               ></span>
             </div>
 
-            <div class="checklist-section" :class="{ visible: !item.Hidden }">
+            <div class="checklist-section" :class="{ visible: !section.Hidden }">
               <transition-group name="slide-fade">
-                <div v-if="!item.Hidden">
+                <div v-if="!section.Hidden">
                   <div
                     class="checklist-items"
-                    v-for="checklistItem in item.Data"
-                    :key="checklistItem.Name"
+                    v-for="checkItem in section.Data"
+                    :key="checkItem.Name"
                   >
                     <div class="form-check">
-                      <label class="form-check-label" :for="checklistItem.Name">
-                        <span>{{ checklistItem.Name }}</span>
+                      <label class="form-check-label" :for="checkItem.Name">
+                        <span>{{ checkItem.Name }}</span>
                         <br />
-                        <small v-if="checklistItem.Desc.length > 1">{{ checklistItem.Desc }}</small>
+                        <small v-if="checkItem.Desc.length > 1">{{ checkItem.Desc }}</small>
                         <small v-else>&nbsp;</small>
                       </label>
                       <input
                         class="form-check-input lrg"
                         type="checkbox"
-                        :id="checklistItem.Name"
-                        v-model="checklistItem.Value"
-                        v-on:change="updateProgress(selectedChecklist, item)"
+                        :id="checkItem.Name"
+                        v-model="checkItem.Value"
+                        v-on:change="updateProgress(section)"
                       />
                     </div>
                   </div>
@@ -130,7 +138,7 @@ export default defineComponent({
         checklistData.value = response.data
         if (checklistData.value.Data[0]) {
           selected.value = checklistData.value.Data[0].Title
-          //checklistData.value.Data[0].Data[0].Hidden = false
+          checklistData.value.Data[0].Data[0].Hidden = false
         }
       } catch (err) {
         console.log('There was an error fetching the Checklist with ID ' + dataID + ' | Error : ' + err)
@@ -171,48 +179,35 @@ export default defineComponent({
       return (100 * partialValue) / totalValue;
     },
 
+    updateProgress(section: any) {
+      let mainChecklistData: any = this.selectedChecklist;
 
-    // Update the progress of the current checklist here.
-    updateProgress(Checklist: any, Parent: any) {
-      // Ensure we are working on the correct Checklist.
-      // Gives us back an array of checklsits matching the current 'selection'
-      let ChecklistData = this.checklistData.Data.filter(obj => {
-        return obj.Title === Checklist.Title
-      })
-
-
-      // Ensure we are working on the right 'section' of the current Playlist.
-      let ChecklistChildData = ChecklistData[0].Data.filter(obj => {
-        return obj.Title === Parent.Title
-      })
-      // We grab it's index too, for future use.
-      let ChecklistChildIndex = ChecklistData[0].Data.findIndex(obj => obj.Title === Parent.Title
+      // Find the index of the section the checked item resides in.
+      let sectionIndex = mainChecklistData.Data.findIndex((obj: any) => obj.Title === section.Title
       );
 
-      // How many checkboxes are there, in this child checklist.
-      const lengthOfCheckItems = ChecklistChildData[0].Data.length;
+      // How many checkboxes are there, in this section.
+      const lengthOfCheckItems = section.Data.length;
 
-      // Finally, we can query our ChecklistChildData, to see how many have been completed 
-      let ChecklistChildCompleted = ChecklistChildData[0].Data.filter(obj => {
+      // Query our check items, inside the section, to see how many have been completed 
+      let checkItemsComplete = section.Data.filter((obj: any) => {
         return obj.Value === true
       })
 
-      // Update our values. 
-      let PercentComplete = this.getPercentage(ChecklistChildCompleted.length, lengthOfCheckItems);
-      Parent.Progress = PercentComplete;
+      // Get a % based on this
+      let percentComplete = this.getPercentage(checkItemsComplete.length, lengthOfCheckItems)
+      section.Progress = percentComplete;
 
-      // keep track of how many Checklists, in each section, are completed.
-      let checkListsComplete = ChecklistData[0].Data.filter((obj: any) => {
-        return obj.Progress === 100
-      })
-
-      ChecklistData[0].Completed = checkListsComplete.length
-
-      if (PercentComplete === 100) {
-        Parent.Hidden = true
+      if (percentComplete === 100) {
+        // Check how many 'sections' have been completed.
+        let sectionsComplete = mainChecklistData.Data.filter((obj: any) => {
+          return obj.Progress === 100
+        })
+        mainChecklistData.Completed = sectionsComplete.length
+        mainChecklistData.Data[sectionIndex].Hidden = true
         // check if the next index exists & is hidden, if it is, show it
-        if (ChecklistData[0].Data[ChecklistChildIndex + 1] && ChecklistData[0].Data[ChecklistChildIndex + 1].Hidden === true) {
-          ChecklistData[0].Data[ChecklistChildIndex + 1].Hidden = false;
+        if (mainChecklistData.Data[sectionIndex + 1] && mainChecklistData.Data[sectionIndex + 1].Hidden === true) {
+          mainChecklistData.Data[sectionIndex + 1].Hidden = false;
         }
       }
     },
@@ -272,9 +267,38 @@ export default defineComponent({
       padding: 0;
       li {
         width: 100%;
-        padding: 0;
-        color: $brand-dark;
+        padding: 15px 10px;
+        color: $color-white;
+        background: $brand-blue-dark;
         font-size: 1.2rem;
+        border-bottom: 2px solid $color-white;
+        cursor: pointer;
+        opacity: 0.85;
+        transition: all 0.3s;
+
+        &:hover {
+          opacity: 1;
+          transition: all 0.2s;
+        }
+
+        &.active {
+          opacity: 1;
+          background: $brand-green;
+        }
+
+        .visible-icon {
+          float: left;
+          width: 35px;
+          text-align: center;
+          margin-right: 10px;
+        }
+
+        .section-progress {
+          float: right;
+          font-size: 0.9rem;
+          line-height: 30px;
+        }
+
         p {
           &.active {
             background: $brand-blue;
