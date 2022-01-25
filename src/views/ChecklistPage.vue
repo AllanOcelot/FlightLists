@@ -1,5 +1,5 @@
 <template>
-  <Checklist :id="1"/>
+  <Checklist />
 </template>
 
 <script>
@@ -7,7 +7,7 @@ import Checklist from '@/components/CheckList.vue'
 
 export default {
   name: 'Checklist View',
-  
+
   components: {
     Checklist,
   },
@@ -15,5 +15,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

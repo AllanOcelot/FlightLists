@@ -1,17 +1,99 @@
 {
   "ID": 1,
   "Name": "Cessna 172",
-  "Desc": "A short description here, summarise the Cessna 172 checklist",
-  "Data": 
-  [
+  "Desc": "Dummy Content, for testing only",
+  "Author": "AllanCodes",
+  "Date": "24/01/22",
+  "Data": [
     {
       "Title": "PreFlight",
       "Desc": "example text to go here, example text to go here, example text to go here",
-      "Author": "AllanCodes",
-      "Completed": false,
+      "Completed": 0,
       "Data": [
         {
           "Title": "Cabin",
+          "Hidden": true,
+          "Data": [
+            {
+              "Name": "Documents",
+              "Type": "Text",
+              "Value": false,
+              "ToDo": "A.R.R.O.W",
+              "Desc": "Remember to check A.R.R.O.W"
+            },
+            {
+              "Name": "Control Lock",
+              "Type": "Text",
+              "Value": false,
+              "ToDo": "Remove",
+              "Desc": " "
+            },
+            {
+              "Name": "Ignition Switch",
+              "Type": "Text",
+              "Value": false,
+              "ToDo": "OFF",
+              "Desc": " "
+            },
+            {
+              "Name": "Avionics Switch",
+              "Type": "Text",
+              "Value": false,
+              "ToDo": "OFF",
+              "Desc": " "
+            },
+            {
+              "Name": "Flaps",
+              "Type": "Text",
+              "Value": false,
+              "ToDo": "DOWN",
+              "Desc": "Complete Visual Check Of Flaps"
+            },
+            {
+              "Name": "Fuel Quantity",
+              "Type": "Text",
+              "Value": false,
+              "ToDo": "CHECK",
+              "Desc": "Additional 30 minutes of fuel, recommended"
+            },
+            {
+              "Name": "Master Switch",
+              "Type": "Text",
+              "Value": false,
+              "ToDo": "OFF",
+              "Desc": ""
+            },
+            {
+              "Name": "Fuel Valve",
+              "Type": "Text",
+              "Value": false,
+              "ToDo": "ON BOTH",
+              "Desc": "Manually turn the fuel valve"
+            }
+          ]
+        },
+        {
+          "Title": "Tail Inspection",
+          "Hidden": true,
+          "Data": [
+            {
+              "Name": "Tail Surface",
+              "Type": "Text",
+              "Value": false,
+              "ToDo": "CHECK",
+              "Desc": "Ensure no visual issues."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Title": "Taxi",
+      "Desc": "example text to go here, example text to go here, example text to go here",
+      "Completed": 0,
+      "Data": [
+        {
+          "Title": "Example dummy content",
           "Hidden": true,
           "Data": [
             {

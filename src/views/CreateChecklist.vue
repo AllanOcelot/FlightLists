@@ -22,26 +22,28 @@
               <label :for="defaultData.Desc" class="form-label">Description:</label>
               <input type="text" class="form-control" :id="defaultData.Desc" v-model="defaultData.Desc">
 
-
-              <p>Selected: {{selected}}</p>
-
               <div class="type-selection">
-                <p class="title">Type To Edit:</p>
-                  <button type="button" class="btn btn-outline-secondary"
-                    v-for="data in defaultData.Data" :key="data.Title"
-                    @click="selected = data.Title"
-                    :class="{active: selected === data.Title}"
-                  >
-                  {{data.Title}}                  
-                  </button>
-                  <button 
-                    type="button" 
-                    class="btn btn-outline-secondary add"
+                <p class="title">
+                  Type of Checklist to edit:
+                  <span 
+                    class="add"
                     @click="addType()"
                   >
                     Add Type
                     <i class="bi bi-plus"></i>
-                  </button>
+                  </span>
+                </p>
+                <ul class="nav nav-tabs">
+                  <li class="nav-item"
+                    v-for="data in defaultData.Data" :key="data.Title"
+                    @click="selected = data.Title"
+                    :class="{active: selected === data.Title}"
+                  >
+                    <span class="nav-link">
+                      {{data.Title}}
+                    </span>
+                  </li>
+                </ul>
               </div>
 
 
@@ -204,10 +206,13 @@ export default {
       }
 
       .type-selection {
-        margin: 20px 0;
-        padding: 20px 0;
+        margin: 40px 0;
+        padding: 40px 0 0 0;
         border-top: 2px solid $color-grey;
         border-bottom: 2px solid $color-grey;
+        .title {
+          font-size: 1.2em;
+        }
         .add {
           float: right;
         }        
