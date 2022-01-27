@@ -22,7 +22,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in listData" :key="item.ID" @click="viewList(item.Filename)">
+          <tr v-for="item in listData" :key="item.ID">
             <td class="align-middle first">{{ item.ID }}</td>
             <td class="align-middle">{{ item.Name }}</td>
             <td class="align-middle">{{ item.Status }}</td>
