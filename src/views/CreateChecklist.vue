@@ -37,8 +37,8 @@
           </div>
           <hr />
           <ul>
-            <li v-for="list in checklist.Data" :key="list.Title">
-              <span class="visible-icon" v-if="selected === list.Title">
+            <li v-for="(list, index) in checklist.Data" :key="list.Title">
+              <span class="visible-icon" v-if="selected === index">
                 <i class="bi bi-eye-fill"></i>
               </span>
               <span class="visible-icon" v-else>
@@ -51,6 +51,7 @@
           <button @click="addList()">Add List</button>
 
           <!-- Submit the checklist / export? How do we save the data?-->
+          <!-- TODO : Let's see if we can somehow export the JSON data via the Github Pull Request API, so users can create a PR easily. -->
         </div>
 
         <div class="flex-fill checklist">
@@ -105,7 +106,7 @@ export default defineComponent({
   setup() {
     let titleEdit = ref(false)
     let descEdit = ref(false)
-    let selected = ref("")
+    let selected = ref(0)
 
     const emptyList = {
       "Title": "Example",
@@ -176,8 +177,9 @@ export default defineComponent({
     )
 
     function getSelectedListIndex() {
-      const index = checklist.Data.findIndex(list => list.Title === selected.value)
-      console.log("index is " + index)
+      //const index = checklist.Data.findIndex(list => list.Title === selected.value)
+      //console.log("index is " + index)
+      const index = selected.value
       return index
     }
 
@@ -185,7 +187,7 @@ export default defineComponent({
 
 
     // Set selected list to be the first list's title.
-    selected.value = checklist.Data[0].Title
+    selected.value = 0
     getSelectedListIndex()
 
     console.log(checklist)
