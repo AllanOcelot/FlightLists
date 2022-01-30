@@ -37,14 +37,23 @@
           </div>
           <hr />
           <ul>
-            <li v-for="(list, index) in checklist.Data" :key="list.Title">
-              <span class="visible-icon" v-if="selected === index">
-                <i class="bi bi-eye-fill"></i>
+            <li
+              v-for="(list, index) in checklist.Data"
+              :class="{ active: selected === index }"
+              :key="index"
+              @click="selected = index"
+            >
+              <span class="visible-icon">
+                <i v-if="selected === index" class="bi bi-eye-fill"></i>
+                <i v-else class="bi bi-eye-slash-fill"></i>
               </span>
-              <span class="visible-icon" v-else>
-                <i class="bi bi-eye-slash-fill"></i>
+              <span v-if="!list.Edit">{{ list.Title }}</span>
+              <input type="text" class="form-control" id="item-title" v-model="list.Title" v-else />
+              <span class="edit-icons" @click="list.Edit = !list.Edit">
+                <span class="edit">
+                  <i class="bi bi-pencil"></i>
+                </span>
               </span>
-              {{ list.Title }}
             </li>
           </ul>
 
@@ -57,10 +66,23 @@
         <div class="flex-fill checklist">
           <div
             class="checklist-parent"
-            v-for="section in checklist.Data[getSelectedListIndex()].Data"
-            :key="section.Title"
+            v-for="(section, index) in checklist.Data[getSelectedListIndex()].Data"
+            :key="index"
           >
-            <div class="title">{{ section.Title }}</div>
+            <div class="title">
+              <span v-if="!section.Edit">{{ section.Title }}</span>
+              <div class="form-group" v-else>
+                <input type="text" class="form-control title-edit" v-model="section.Title" />
+              </div>
+              <span class="edit" @click="section.Edit = !section.Edit">
+                <span v-if="section.Edit">
+                  <i class="bi bi-x close"></i>
+                </span>
+                <span v-else>
+                  <i class="bi bi-pencil"></i>
+                </span>
+              </span>
+            </div>
             <div class="checklist-section visible">
               <div class="checklist-items" v-for="item in section.Data" :key="item.Name">
                 <div class="form-group row">
@@ -81,13 +103,16 @@
                       type="text"
                       class="form-control"
                       id="item-details"
-                      placeholder="Please provide a title"
+                      placeholder="Please provide details"
                     />
                   </div>
                 </div>
               </div>
 
-              <button @click="addItem(checklist, section)">Add new item</button>
+              <span
+                class="btn btn-outline-dark add-item"
+                @click="addItem(checklist, section)"
+              >Add new item to section</span>
             </div>
           </div>
 
@@ -108,40 +133,16 @@ export default defineComponent({
     let descEdit = ref(false)
     let selected = ref(0)
 
-    const emptyList = {
-      "Title": "Example",
-      "Hidden": false,
-      "Completed": 0,
-      "Data": []
-    }
+
 
     const emptySection = {
       "Title": "Cabin",
       "Hidden": true,
-      "Data": []
+      "Edit": false,
+      "Data": Array()
     }
 
 
-    const emptyItem = {
-      "Name": "Item Title",
-      "Type": "",
-      "Value": false,
-      "ToDo": "",
-      "Desc": ""
-    }
-
-    /*
-    interface type_checklist {
-      "ID": number,
-      "Name": String,
-      "Desc": String,
-      "Author": String,
-      "Date": String,
-      "Data": [{
-
-      }]
-    }
-    */
 
 
     // The 'Blank' Checklist all others are built from.
@@ -156,10 +157,12 @@ export default defineComponent({
           "Title": "PreFlight",
           "Desc": "example text to go here, example text to go here, example text to go here",
           "Completed": 0,
+          "Edit": false,
           "Data": [
             {
               "Title": "Cabin",
               "Hidden": true,
+              "Edit": false,
               "Data": [
                 {
                   "Name": "Documents",
@@ -195,9 +198,7 @@ export default defineComponent({
     return {
       titleEdit,
       descEdit,
-      emptyList,
       emptySection,
-      emptyItem,
       selected,
       checklist,
       getSelectedListIndex
@@ -206,18 +207,46 @@ export default defineComponent({
   },
   methods: {
     addList() {
-      this.checklist.Data.push(this.emptyList)
+      const emptyList = {
+        "Title": "Example",
+        "Hidden": false,
+        "Completed": 0,
+        "Desc": "",
+        "Edit": false,
+        "Data": Array()
+      }
+      this.checklist.Data.push(emptyList)
     },
 
     addSection() {
-      this.checklist.Data[this.getSelectedListIndex()].Data.push(this.emptySection)
+      const emptyList = {
+        "Title": "Example",
+        "Hidden": false,
+        "Completed": 0,
+        "Desc": "",
+        "Edit": false,
+        "Data": Array()
+      }
+
+      let section = {
+        "Title": "Section Title",
+        "Hidden": true,
+        "Edit": false,
+        "Data": Array()
+      }
+      section.Data.push(emptyList)
+      this.checklist.Data[this.getSelectedListIndex()].Data.push(section)
     },
 
     addItem(checklist: any, section: any) {
-      console.log(section)
-      section.Data.push(this.emptyItem)
-      console.log(checklist)
-      console.log(section)
+      const emptyItem = {
+        "Name": "Item Title",
+        "Type": "",
+        "Value": false,
+        "ToDo": "",
+        "Desc": ""
+      }
+      section.Data.push(emptyItem)
     }
 
 
@@ -260,10 +289,46 @@ export default defineComponent({
   .desc-container .edit {
     top: 0;
   }
+
+  ul {
+    li {
+      padding-right: 40px !important;
+      position: relative;
+      .edit-icons {
+        cursor: pointer;
+        position: absolute;
+        right: 10px;
+      }
+    }
+  }
 }
 
-.checklist-main .checklist .checklist-parent .title {
-  cursor: default;
+.checklist-main .checklist .checklist-parent {
+  .checklist-section.visible {
+    .add-item {
+      float: right;
+      margin-bottom: 20px;
+    }
+  }
+  .title {
+    cursor: default;
+    position: relative;
+    padding-right: 65px;
+    .edit {
+      top: 0;
+      height: 100%;
+      padding-top: 10px;
+      text-align: center;
+      cursor: pointer;
+      position: absolute;
+      right: 20px;
+      opacity: 0.8;
+      transition: all 0.3s;
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
 }
 
 .checklist-items {
