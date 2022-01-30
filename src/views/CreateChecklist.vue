@@ -44,20 +44,24 @@
               @click="selected = index"
             >
               <span class="visible-icon">
-                <i v-if="selected === index" class="bi bi-eye-fill"></i>
-                <i v-else class="bi bi-eye-slash-fill"></i>
+                <i v-if="selected === index && !list.Edit" class="bi bi-eye-fill"></i>
+                <i v-if="selected !== index && !list.Edit" class="bi bi-eye-slash-fill"></i>
+                <i v-if="list.Edit" class="bi bi-trash remove" @click="removeList(index)"></i>
               </span>
               <span v-if="!list.Edit">{{ list.Title }}</span>
               <input type="text" class="form-control" id="item-title" v-model="list.Title" v-else />
               <span class="edit-icons" @click="list.Edit = !list.Edit">
                 <span class="edit">
-                  <i class="bi bi-pencil"></i>
+                  <i class="bi bi-pencil" v-if="!list.Edit"></i>
+                  <i class="bi bi-x close" v-else></i>
                 </span>
               </span>
             </li>
           </ul>
 
-          <button @click="addList()">Add List</button>
+          <button class="btn btn-outline" @click="addList()">Add New Checklist</button>
+
+          <div class="actions"></div>
 
           <!-- Submit the checklist / export? How do we save the data?-->
           <!-- TODO : Let's see if we can somehow export the JSON data via the Github Pull Request API, so users can create a PR easily. -->
@@ -142,9 +146,6 @@ export default defineComponent({
       "Data": Array()
     }
 
-
-
-
     // The 'Blank' Checklist all others are built from.
     let checklist = reactive({
       "ID": 1,
@@ -186,9 +187,6 @@ export default defineComponent({
       return index
     }
 
-
-
-
     // Set selected list to be the first list's title.
     selected.value = 0
     getSelectedListIndex()
@@ -216,6 +214,9 @@ export default defineComponent({
         "Data": Array()
       }
       this.checklist.Data.push(emptyList)
+    },
+    removeList(index: number) {
+      this.checklist.Data.splice(index, 1)
     },
 
     addSection() {
@@ -248,8 +249,6 @@ export default defineComponent({
       }
       section.Data.push(emptyItem)
     }
-
-
   },
   components: {
 
@@ -292,8 +291,19 @@ export default defineComponent({
 
   ul {
     li {
+      display: flex;
       padding-right: 40px !important;
       position: relative;
+      input {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+      .remove {
+        transition: all 0.3s;
+        &:hover {
+          color: red;
+        }
+      }
       .edit-icons {
         cursor: pointer;
         position: absolute;
