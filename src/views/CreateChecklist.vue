@@ -61,7 +61,9 @@
 
           <button class="btn btn-outline" @click="addList()">Add New Checklist</button>
 
-          <div class="actions"></div>
+          <div class="actions">
+            <button class="btn" @click="exportData()">Export To FlightLists</button>
+          </div>
 
           <!-- Submit the checklist / export? How do we save the data?-->
           <!-- TODO : Let's see if we can somehow export the JSON data via the Github Pull Request API, so users can create a PR easily. -->
@@ -116,7 +118,7 @@
               <span
                 class="btn btn-outline-dark add-item"
                 @click="addItem(checklist, section)"
-              >Add new item to section</span>
+              >Add new item</span>
             </div>
           </div>
 
@@ -128,6 +130,7 @@
 </template>
 
 <script lang="ts">
+import axios from 'axios'
 import { defineComponent, ref, reactive } from "vue"
 
 export default defineComponent({
@@ -191,8 +194,6 @@ export default defineComponent({
     selected.value = 0
     getSelectedListIndex()
 
-    console.log(checklist)
-
     return {
       titleEdit,
       descEdit,
@@ -248,7 +249,34 @@ export default defineComponent({
         "Desc": ""
       }
       section.Data.push(emptyItem)
+    },
+
+    exportData() {
+      // TODO: move this to a node server ? Y E S 
+
+      console.log(JSON.stringify(this.checklist))
+
+      const axiosHeader = {
+        'content-type': 'application/json; charset=utf-8'
+      }
+
+      axios.post('http://localhost:3000/submit', JSON.stringify(this.checklist), {
+        headers: axiosHeader
+      })
+        .then((res) => {
+          //Perform Success Action
+          console.log(res)
+        })
+        .catch((error) => {
+          // error.response.status Check status code
+          console.log(error)
+        }).finally(() => {
+          //Perform action in always
+        });
+
     }
+
+
   },
   components: {
 
@@ -257,6 +285,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/vars.scss";
 @import "../assets/vars.scss";
 @import "../assets/common.scss";
 @import "../assets/checklist.scss";
